@@ -160,10 +160,10 @@ static void on_display(void)
     draw_menu_before_starting(&start_parameter);
 
     // draw_airplane();
-    // draw_UFO();
+    // draw_UFO(0, 0);
     draw_moon();
     draw_wire_sphere(0, 0, 0);
-    //draw_cloud(0);
+    // draw_cloud(0, 0, 0);
 
     izbor_prepreka();
 

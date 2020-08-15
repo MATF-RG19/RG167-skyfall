@@ -164,12 +164,6 @@ void draw_wire_sphere(float x2, float y2, float z2) {
 //Funckija za iscrtavanje oblaka
 void draw_cloud(int x, int pos_x, int pos_y)
 {
-    // if (left_right) {
-    //     pos_x = -pos_x;
-    //     left_right = false;
-    // } else {
-    //     left_right = true;
-    // }
     pos_y = -pos_y;
     glPushMatrix();
         move_cloud_x += x;
@@ -240,14 +234,9 @@ void draw_airplane()
 
 void draw_UFO(int pos_x, int pos_y)
 {
-    // if (left_right) {
-    //     pos_x = -pos_x;
-    //     left_right = false;
-    // } else {
-    //     left_right = true;
-    // }
     pos_y = -pos_y;
     glPushMatrix();
+        glTranslatef(0.0, -2.0, 0.0);
         glBegin(GL_POLYGON);
             glColor3f(0.5, 0.5, 0.5);
             glVertex3f(6.0 + pos_x, 0 + pos_y, 0.0);
