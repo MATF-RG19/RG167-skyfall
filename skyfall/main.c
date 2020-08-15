@@ -8,7 +8,12 @@
 #define TIMER_ID 0
 #define TIMER_INTERVAL 100
 
+//Maksimalna duzina niske za instrukcije
+#define MAX 50
+
 static int animation_ongoing = 0;
+static int start_parameter = 0;
+static int stop_parametar = 0;
 
 static void on_display(void);
 static void on_reshape(int width, int height);
@@ -22,30 +27,13 @@ static float z = 0;
 static float background_color_g = 0.1;
 static float background_color_b = 0.4;
 
-int main(int argc, char **argv)
-{
-    glutInit(&argc, argv);
-    glutInitDisplayMode(GLUT_RGB | GLUT_DOUBLE | GLUT_DEPTH);
+// static float move_cloud_x = -1;
+static float igrac_pomeraj = -0.75;
+static float igrac_pomeraj_levo = -0.75;
+static float igrac_pomeraj_desno = 0.75;
 
-    glutInitWindowSize(800, 600);
-    glutInitWindowPosition(0, 0);
-
-    glutCreateWindow("Skyfall");
-
-    // tex_initialization();
-
-    glutDisplayFunc(on_display);
-    glutKeyboardFunc(on_keyboard);
-    glutReshapeFunc(on_reshape);
-
-    glEnable(GL_COLOR_MATERIAL);
-    glEnable(GL_NORMALIZE);
-    glEnable(GL_DEPTH_TEST);
-
-    glutMainLoop();
-
-    return 0;
-}
+// Promenljiva koja pomaze da nakon pokretanja igre kuglica sa vrha ekrana dodje na centar
+static int centralize = 1;
 
 //Beskonacno padanje loptice
 static void on_timer(int value)
@@ -53,20 +41,33 @@ static void on_timer(int value)
     if (value != TIMER_ID)
         return;
 
-    y += -1;
+    y += -0.75;
+    // fprintf(stdout, "%f", y);
+
+    if (centralize != 8) {
+        centralize++;
+        draw_wire_sphere(0, igrac_pomeraj, 0);
+        draw_wire_sphere(0, igrac_pomeraj, 0);
+    } else {
+        draw_wire_sphere(0, igrac_pomeraj, 0);
+    }
 
     background_color_b += 0.005;
-    if (background_color_g < 0.65)
+    if (background_color_g < 0.7)
         background_color_g += 0.001;
 
-    draw_wire_sphere(0, -1, 0);
-
+    // draw_wire_sphere(0, -1, 0);
+    //draw_cloud(-1);
 
     //Ponovno iscrtavanje prozora
     glutPostRedisplay();
 
+    stop_parametar = 0;
+        
     if (animation_ongoing) {
         glutTimerFunc(TIMER_INTERVAL, on_timer, TIMER_ID);
+    } else if (!animation_ongoing && !stop_parametar) {
+        y = 0;
     }
 }
 
@@ -77,7 +78,7 @@ static void on_timer_d(int value)
         return;
 
     if (animation_ongoing)
-        draw_wire_sphere(1, 0, 0);
+        draw_wire_sphere(igrac_pomeraj_desno, 0, 0);
     
 
     //Ponovno iscrtavanje prozora
@@ -91,7 +92,7 @@ static void on_timer_a(int value)
         return;
 
     if (animation_ongoing)
-        draw_wire_sphere(-1, 0, 0);
+        draw_wire_sphere(igrac_pomeraj_levo, 0, 0);
 
     //Ponovno iscrtavanje prozora
     glutPostRedisplay();
@@ -106,8 +107,22 @@ static void on_keyboard(unsigned char key, int x, int y)
         //Reset
         case 'r':
         case 'R':
+            pozicija_prepreka();
+            background_color_g = 0.1;
+            background_color_b = 0.4;
+            animation_ongoing = 0;
+            centralize = 1;
+            game_reset_function();
+            glutDisplayFunc(on_display);
+            glutPostRedisplay();
+            break;
+
+        case 's':
+        case 'S':
+            stop_parametar = 1;
             animation_ongoing = 0;
             break;
+
         //Pomeranje coveculjka po x osi desno
         case 'd':
         case 'D':
@@ -124,6 +139,9 @@ static void on_keyboard(unsigned char key, int x, int y)
                 animation_ongoing = 1;
             }
             break;
+
+        default:
+            break;
     }
 }
 
@@ -133,14 +151,21 @@ static void on_display(void)
     glClearColor(0.0,background_color_g,background_color_b,1);
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
-    gluLookAt(0, 12 + y, 20,
+    gluLookAt(0, y, 20,
               0, y, 0,
               0, 1, 0);
 
-    coordinacion_system_draw();
+    // coordinacion_system_draw();
 
+    draw_menu_before_starting(&start_parameter);
+
+    // draw_airplane();
+    // draw_UFO();
+    draw_moon();
     draw_wire_sphere(0, 0, 0);
-    draw_cloud();
+    //draw_cloud(0);
+
+    izbor_prepreka();
 
     glutSwapBuffers();
 }
@@ -154,4 +179,30 @@ static void on_reshape(int width, int height){
     glLoadIdentity();
     gluPerspective(60, (float)width/height, 1, 1000);
     glutFullScreen();
+}
+
+int main(int argc, char **argv)
+{
+    pozicija_prepreka();
+    glutInit(&argc, argv);
+    glutInitDisplayMode(GLUT_RGB | GLUT_DOUBLE | GLUT_DEPTH);
+
+    glutInitWindowSize(800, 600);
+    glutInitWindowPosition(0, 0);
+
+    glutCreateWindow("Skyfall");
+
+    initialize();
+
+    glutDisplayFunc(on_display);
+    glutKeyboardFunc(on_keyboard);
+    glutReshapeFunc(on_reshape);
+
+    glEnable(GL_COLOR_MATERIAL);
+    glEnable(GL_NORMALIZE);
+    glEnable(GL_DEPTH_TEST);
+
+    glutMainLoop();
+
+    return 0;
 }
