@@ -14,6 +14,6 @@ ___
 
 ### :alien: Pokretanje i instalacija
 * Preuzeti folder sa github-a komandom: :link: ``` git clone https://github.com/MATF-RG19/RG167-skyfall``` <br>
-* Postavite se u direktorijum: 'RG167/skyfall/skyfall' <br>
+* Postavite se u direktorijum: 'RG167-skyfall/skyfall' <br>
 * Pokrenuti Makefile uz pomoc komande 'make' u terminalu. <br>
 * Pokrenuti igricu komandom './skyfall'
