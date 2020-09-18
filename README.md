@@ -9,7 +9,7 @@ ___
 <kbd>space</kbd> Početak igre.<br>
 <kbd>A</kbd> / <kbd>a</kbd> Pomeranje čovečuljka koji pada u levu stranu.<br>
 <kbd>D</kbd> / <kbd>d</kbd> Pomeranje čovečuljka koji pada u desnu stranu.<br>
-<kbd>R</kbd> / <kbd>r</kbd> Restartovanje igra u slučaju gubitka.<br>
+<kbd>R</kbd> / <kbd>r</kbd> Restartovanje igre u slučaju gubitka.<br>
 <kbd>ESC</kbd> Izlaz iz igrice.
 
 ### :alien: Pokretanje i instalacija
