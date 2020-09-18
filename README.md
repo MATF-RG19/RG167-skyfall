@@ -1,5 +1,4 @@
 # :milky_way: :partly_sunny: SkyFall
-Skyfall
 ___
 
 ## :cyclone: Kratak opis igrice:
