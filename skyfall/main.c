@@ -13,7 +13,10 @@
 
 static int animation_ongoing = 0;
 static int start_parameter = 0;
-static int stop_parametar = 0;
+static int reset_parametar = 0;
+// static int pause_parametar = 0;
+
+static int prvo_iscrtavanje = 1;
 
 static void on_display(void);
 static void on_reshape(int width, int height);
@@ -24,22 +27,38 @@ static float x = 0;
 static float y = 0;
 static float z = 0;
 
+// Korsiceno pre stavljanja teksture radi davanja utiska od realnom padu
 static float background_color_g = 0.1;
 static float background_color_b = 0.4;
 
+// Koriscene promenljive za pomeranje coveculjka na dole konstantno i levo i desno po pritisku na odgovarajuce dugme
 // static float move_cloud_x = -1;
 static float igrac_pomeraj = -0.75;
 static float igrac_pomeraj_levo = -0.75;
 static float igrac_pomeraj_desno = 0.75;
 
+
+// static float semaphore_pomeraj = 0.75;
+
 // Promenljiva koja pomaze da nakon pokretanja igre kuglica sa vrha ekrana dodje na centar
 static int centralize = 1;
+
+// Indikator uspesnosti uz pomoc
+static int ind_usp = 0;
+static int stop_kamera = 0;
 
 //Beskonacno padanje loptice
 static void on_timer(int value)
 {
     if (value != TIMER_ID)
         return;
+
+    draw_background(-0.81);
+
+    if (reset_parametar) {
+        y = 0;
+        reset_parametar = 0;
+    }
 
     y += -0.75;
     // fprintf(stdout, "%f", y);
@@ -56,18 +75,13 @@ static void on_timer(int value)
     if (background_color_g < 0.7)
         background_color_g += 0.001;
 
-    // draw_wire_sphere(0, -1, 0);
-    //draw_cloud(-1);
-
+    
     //Ponovno iscrtavanje prozora
     glutPostRedisplay();
 
-    stop_parametar = 0;
-        
+
     if (animation_ongoing) {
         glutTimerFunc(TIMER_INTERVAL, on_timer, TIMER_ID);
-    } else if (!animation_ongoing && !stop_parametar) {
-        y = 0;
     }
 }
 
@@ -104,9 +118,12 @@ static void on_keyboard(unsigned char key, int x, int y)
         case 27:
             exit(0);
             break;
-        //Reset
+        //Reset za vracanje svih vrednosti na pocetne
         case 'r':
         case 'R':
+            y = 0;
+            reset_parametar = 1;
+            // Zbog reseta kako bi utisak bio bolji biraju se druge pozicije prepreki
             pozicija_prepreka();
             background_color_g = 0.1;
             background_color_b = 0.4;
@@ -117,11 +134,14 @@ static void on_keyboard(unsigned char key, int x, int y)
             glutPostRedisplay();
             break;
 
-        case 's':
-        case 'S':
-            stop_parametar = 1;
-            animation_ongoing = 0;
-            break;
+        // case 's':
+        // case 'S':
+        //     pause_parametar = 1;
+        //     if (animation_ongoing)
+        //         animation_ongoing = 0;
+        //     else
+        //         animation_ongoing = 1;
+        //     break;
 
         //Pomeranje coveculjka po x osi desno
         case 'd':
@@ -133,6 +153,7 @@ static void on_keyboard(unsigned char key, int x, int y)
         case 'A':
             glutTimerFunc(TIMER_INTERVAL, on_timer_a, TIMER_ID);
             break;
+        // Pocetak igre
         case ' ':
             if (!animation_ongoing) {
                 glutTimerFunc(TIMER_INTERVAL, on_timer, TIMER_ID);
@@ -157,14 +178,21 @@ static void on_display(void)
 
     // coordinacion_system_draw();
 
-    draw_menu_before_starting(&start_parameter);
+    // Iscrtavanje pozadinske i pocetke teskture
+    int stop_kamera = draw_background(0);
 
-    // draw_airplane();
-    // draw_UFO(0, 0);
+    
+
+    // U slucaju kolizije iscrtavanje game_over teskture
+
+    // Semafor za ispis poena     
+    draw_semaphore_before_starting(&start_parameter);
+
+    // Pocetno iscrtavanje coveka i meseca pre poceta igra
     draw_moon();
-    draw_wire_sphere(0, 0, 0);
-    // draw_cloud(0, 0, 0);
+    draw_person();
 
+    // Nasumicni izbor prepreki
     izbor_prepreka();
 
     glutSwapBuffers();
@@ -183,6 +211,8 @@ static void on_reshape(int width, int height){
 
 int main(int argc, char **argv)
 {
+
+    // Pre pocetka igre inicializa pozicija na kojima ce se promenljive nalaziti
     pozicija_prepreka();
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_RGB | GLUT_DOUBLE | GLUT_DEPTH);
